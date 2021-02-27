@@ -126,7 +126,8 @@ namespace Vicomp
             {
                 if (arg[i] == "-o")
                 {
-                    arg[i] = name;
+                  name = arg[i +1];
+
                 }
             }
 
