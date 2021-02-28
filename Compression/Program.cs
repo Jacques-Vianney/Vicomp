@@ -141,11 +141,11 @@ namespace Vicomp
                 Console.WriteLine(@"
                        ___________Compress___________
 
-                -help              show this text
-                -cmp              compress file    (with native key)
-                -dcmp             decompress file  (with native key)
-                -cmp  -key         compress file     with personal key 
-                -dcmp -key         decompress file   with personal key");
+                -help                      show this text
+                -cmp                       compress file    (with native key)
+                -dcmp                      decompress file  (with native key)
+                -cmp  -key  (-o filename)  compress file     with personal key 
+                -dcmp -key                 decompress file   with personal key");
                 Environment.Exit(1);
             }
 
@@ -179,7 +179,7 @@ namespace Vicomp
                 file = File.ReadAllBytes(arg[1]);
                 stream = AES_Decrypt(file,key, Vicomp.IV);
                 FinalFile = VDecompress(stream);
-                ByteArrayToFile(name +".dvia", FinalFile);
+                ByteArrayToFile("Decompressed" +".via", FinalFile);
 
             }
 
