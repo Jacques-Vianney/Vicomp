@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.IO.Compression;
 using System.IO;
@@ -27,7 +27,6 @@ namespace Vicomp
 
         static void Main(string[] args)
         {
-
             ArgsAndCrypt(args);
 
         }
@@ -46,7 +45,7 @@ namespace Vicomp
                 using (MemoryStream ms = new MemoryStream())
                 {
                     using (CryptoStream cs = new CryptoStream(ms, aes.CreateEncryptor(),
-          CryptoStreamMode.Write))
+                           CryptoStreamMode.Write))
                     {
                         cs.Write(clearBytes, 0, clearBytes.Length);
                         cs.Close();
@@ -57,7 +56,8 @@ namespace Vicomp
             return encryptedBytes;
         }
 
-        private static byte[] AES_Decrypt(byte[] cryptBytes, byte[] passBytes, byte[] saltBytes)
+        private static byte[] AES_Decrypt(byte[] cryptBytes,
+            byte[] passBytes, byte[] saltBytes)
         {
             byte[] clearBytes = null;
 
@@ -71,7 +71,8 @@ namespace Vicomp
 
                 using (MemoryStream ms = new MemoryStream())
                 {
-                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Write))
+                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(),
+                        CryptoStreamMode.Write))
                     {
                         cs.Write(cryptBytes, 0, cryptBytes.Length);
                         cs.Close();
@@ -119,15 +120,19 @@ namespace Vicomp
             byte[] FinalFile;
             byte[] key;
             key = Vicomp.Key;
-            string name = Path.GetFileNameWithoutExtension(arg[1]);
+            string name = "";
 
+            if(arg.Length > 0)
+            {
+                name = Path.GetFileNameWithoutExtension(arg[1]);
+
+            }
 
             for (int i = 0; i < arg.Length; i++)
             {
                 if (arg[i] == "-o")
                 {
-                  name = arg[i +1];
-
+                    name = arg[i +1];
                 }
             }
 
@@ -146,6 +151,7 @@ namespace Vicomp
 
             else if (arg[0] == "-cmp")
             {
+
                 if (arg.Length > 2)
                 {
                     if (arg[2] == "-key")
@@ -161,6 +167,7 @@ namespace Vicomp
             }
             else if (arg[0] == "-dcmp")
             {
+
                 if (arg.Length > 2)
                 {
                     if (arg[2] == "-key")
