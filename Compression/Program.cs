@@ -3,6 +3,7 @@ using System.Text;
 using System.IO.Compression;
 using System.IO;
 using System.Security.Cryptography;
+using System.Linq;
 
 namespace Vicomp
 {
@@ -23,10 +24,11 @@ namespace Vicomp
     {
         static readonly byte[] Key = { 23, 6, 104, 230, 16, 104, 230, 250, 104, 213, 16, 104, 240, 16, 104, 213 };
 
-        static readonly byte[] IV = { 0, 36,54, 16, 104,73,35,22,43,3,96,69,2,1,3,7 };
+        static readonly byte[] IV = { 0, 36, 54, 16, 104, 73, 35, 22, 43, 3, 96, 69, 2, 1, 3, 7 };
 
         static void Main(string[] args)
         {
+        
             ArgsAndCrypt(args);
 
         }
@@ -106,7 +108,7 @@ namespace Vicomp
             return output.ToArray();
         }
 
-        static void  ArgsAndCrypt(string[] arg)
+        static void ArgsAndCrypt(string[] arg)
         {
 
 
@@ -122,17 +124,17 @@ namespace Vicomp
             key = Vicomp.Key;
             string name = "";
 
-            if(arg.Length > 0)
+            if (arg.Length > 0)
             {
                 name = Path.GetFileNameWithoutExtension(arg[1]);
-
+                path = Path.GetExtension(arg[1]);
             }
 
             for (int i = 0; i < arg.Length; i++)
             {
                 if (arg[i] == "-o")
                 {
-                    name = arg[i +1];
+                    name = arg[i + 1];
                 }
             }
 
@@ -141,11 +143,11 @@ namespace Vicomp
                 Console.WriteLine(@"
                        ___________Compress___________
 
-                -help                      show this text
-                -cmp                       compress file    (with native key)
-                -dcmp                      decompress file  (with native key)
-                -cmp  -key  (-o filename)  compress file     with personal key 
-                -dcmp -key                 decompress file   with personal key");
+                -help              show this text
+                -cmp              compress file    (with native key)
+                -dcmp             decompress file  (with native key)
+                -cmp  -key         compress file     with personal key 
+                -dcmp -key         decompress file   with personal key");
                 Environment.Exit(1);
             }
 
@@ -159,10 +161,10 @@ namespace Vicomp
                         key = Encoding.ASCII.GetBytes(arg[3]);
                     }
                 }
-               file= File.ReadAllBytes(arg[1]);
-               stream = VCompress(file);
-               FinalFile = AES_Encrypt(stream,key, Vicomp.IV);
-               ByteArrayToFile(name + ".via", FinalFile);
+                file = File.ReadAllBytes(arg[1]);
+                stream = VCompress(file);
+                FinalFile = AES_Encrypt(stream, key, Vicomp.IV);
+                ByteArrayToFile(name + ".via", FinalFile,arg[0],path);
 
             }
             else if (arg[0] == "-dcmp")
@@ -177,33 +179,94 @@ namespace Vicomp
                     }
                 }
                 file = File.ReadAllBytes(arg[1]);
-                stream = AES_Decrypt(file,key, Vicomp.IV);
+                GetExtension(file[file.Length - 1]);
+                file = file.Take(file.Count() - 1).ToArray();
+                stream = AES_Decrypt(file, key, Vicomp.IV);
                 FinalFile = VDecompress(stream);
-                ByteArrayToFile("Decompressed" +".via", FinalFile);
+                ByteArrayToFile(name, FinalFile,arg[0]);
 
             }
 
         }
 
-        public static bool ByteArrayToFile(string fileName, byte[] byteArray)
+
+
+
+        public static bool ByteArrayToFile(string fileName, byte[] byteArray,string arg,string ext = "")
         {
-            try
+
+            if (arg == "-cmp")
             {
-                using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                byte[] fileWithExtension = new byte[byteArray.Length + 1];
+                byte extbyte = (byte)Array.IndexOf(extension, ext);
+                Array.Copy(byteArray, fileWithExtension, byteArray.Length);
+                fileWithExtension[fileWithExtension.Length - 1] = extbyte;
+                try
                 {
-                    fs.Write(byteArray, 0, byteArray.Length);
-                    return true;
+                    using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                    {
+                        fs.Write(fileWithExtension, 0, fileWithExtension.Length);
+                        return true;
+                    }
+                }
+
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Exception caught in process: {0}", ex);
+                    return false;
                 }
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine("Exception caught in process: {0}", ex);
-                return false;
+
+                fileName = fileName + path;
+
+                try
+                {
+                    using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                    {
+                        fs.Write(byteArray, 0, byteArray.Length);
+                        return true;
+                    }
+                }
+
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Exception caught in process: {0}", ex);
+                    return false;
+                }
             }
+
+
         }
+
+
+        public static string[] extension = new string[9] {
+                 ".exe",
+                 ".png",
+                 ".jpg",
+                 ".dll",
+                 ".pdf",
+                 ".mp3",
+                 ".mp4",
+                 ".txt",
+                 ".via",
+        };
+        static string path;
+
+        public static void GetExtension(byte index)
+        {
+            if (extension[index] != null)
+            {
+                path = extension[index];
+
+            }
+
+        }
+
+
 
     }
 
-
-
+    
 }
