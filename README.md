@@ -7,6 +7,3 @@ Usage
 ```
 Vicomp.exe -cmp/-dcmp optional args: -key -o
 ```
-```
-Vicomp.exe -help
-```
